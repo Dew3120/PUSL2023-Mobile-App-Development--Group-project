@@ -1,0 +1,35 @@
+name: my_cartier
+description: "A luxury retail mobile application for Cartier, featuring a custom jewelry configurator and real-time inventory management integrated with Firebase Cloud."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  firebase_core: ^4.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Asset registration
+  assets:
+    - assets/images/
+    - assets/fonts/
+
+  # Custom font registration using the files you found
+  fonts:
+    - family: Basis
+      fonts:
+        - asset: assets/fonts/ffb_basis_regular.otf
+        - asset: assets/fonts/ffb_basis_bold.otf
+          weight: 700

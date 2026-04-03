@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1038631969256",
+    "project_id": "my-cartier-cloud",
+    "storage_bucket": "my-cartier-cloud.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038631969256:android:6ca9283949a64be1f3445d",
+        "android_client_info": {
+          "package_name": "com.thisara.cartier.my_cartier"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbdY2TuhkbRDTgU0EQgB6tRyw-9m3NG7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
