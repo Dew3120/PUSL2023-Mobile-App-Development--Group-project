@@ -44,3 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .claude/
+
+# Video assets (add your own background.mp4 locally)
+assets/videos/
+
+# Build outputs
+android/build/
