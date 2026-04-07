@@ -12,6 +12,12 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   firebase_core: ^4.6.0
+  firebase_auth: ^6.3.0
+  video_player: ^2.9.2
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.3.2
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -25,6 +31,7 @@ flutter:
   assets:
     - assets/images/
     - assets/fonts/
+    - assets/videos/
 
   # Custom font registration using the files you found
   fonts:
