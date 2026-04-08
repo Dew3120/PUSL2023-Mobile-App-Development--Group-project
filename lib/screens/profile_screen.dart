@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'panther_screen.dart';
+import 'cart_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -39,7 +40,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.shopping_bag_outlined, size: 24),
-                      onPressed: () {},
+                      onPressed: () {
+                        // ── ADDED NAVIGATION HERE ──
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CartScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -196,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (_) => const LoginScreen()),
-                          (route) => false,
+                              (route) => false,
                         );
                       }
                     },

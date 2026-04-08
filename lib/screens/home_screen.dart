@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/catalogue.dart';
 import 'category_screen.dart';
 import 'sale_screen.dart';
+import 'cart_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,7 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          // ── Top bar ──────────────────────────────────────────────────────
+
           SliverToBoxAdapter(
             child: Column(
               children: [
@@ -43,7 +44,12 @@ class HomeScreen extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.shopping_bag_outlined, size: 24),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const CartScreen()),
+                          );
+                        },
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),

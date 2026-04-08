@@ -406,7 +406,8 @@ class _SaleCard extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(product: p)),
+            builder: (_) => ProductDetailScreen(product: p,
+              salePrice: saleProduct.salePrice,)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

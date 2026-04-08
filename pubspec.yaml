@@ -32,7 +32,7 @@ flutter:
   assets:
     - assets/images/
     - assets/fonts/
-    - assets/videos/
+    #- assets/videos/
 
   # Custom font registration using the files you found
   fonts:

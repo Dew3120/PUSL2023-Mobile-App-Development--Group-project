@@ -5,8 +5,8 @@
 import FlutterMacOS
 import Foundation
 
-import firebase_auth
 import cloud_firestore
+import firebase_auth
 import firebase_core
 import shared_preferences_foundation
 import url_launcher_macos

@@ -1,171 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../data/catalogue.dart';
+import 'product_detail_screen.dart';
+import 'cart_screen.dart';
 
-class AutoSaleScreen extends StatefulWidget {
+
+class AutoSaleData {
+  static List<Map<String, dynamic>> getPermanentSaleItems() {
+    List<Map<String, dynamic>> saleItems = [];
+
+    for (final cat in Catalogue.categories) {
+      for (final sub in cat.subCategories) {
+        if (sub.products.isNotEmpty) {
+          final p = sub.products.last;
+          saleItems.add({
+            'product': p,
+            'salePrice': p.price * 0.85,
+          });
+        }
+      }
+    }
+    return saleItems;
+  }
+}
+
+
+class AutoSaleScreen extends StatelessWidget {
   const AutoSaleScreen({super.key});
 
   @override
-  State<AutoSaleScreen> createState() => _AutoSaleScreenState();
-}
-
-class _AutoSaleScreenState extends State<AutoSaleScreen> {
-  String _selectedFilter = 'All';
-
-  @override
   Widget build(BuildContext context) {
+    final saleItems = AutoSaleData.getPermanentSaleItems();
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Sale',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.shopping_bag_outlined, size: 24, color: Colors.black),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      appBar: _buildHeader(context, 'Private Archives'),
       body: Column(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Exclusive deals — updated daily',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                  ),
-
-                  // Intelligent Auto-Sale Banner
-                  Container(
-                    margin: const EdgeInsets.all(16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFC41E1E), // Cartier Red
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'INTELLIGENT AUTO-SALE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  letterSpacing: 1.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Items curated by our smart algorithm',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Filter Chips
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        _buildFilterChip('All'),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Rings'),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Necklaces'),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Brands'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Product Grid
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 20,
-                    childAspectRatio: 0.58,
-                    children: [
-                      _buildSaleProductCard('Diamond Ring', 'Cartier', '£3,200', '£4,000', '-20%'),
-                      _buildSaleProductCard('Pearl Earrings', 'Tiffany & Co', '£890', '£1,200', '-25%'),
-                      _buildSaleProductCard('Gold Bracelet', 'Bulgari', '£2,100', '£3,000', '-30%'),
-                      _buildSaleProductCard('Ruby Necklace', 'Cartier', '£5,100', '£6,000', '-15%'),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Text(
+              'CURATED PIECES AT EXCLUSIVE ARCHIVE PRICING',
+              style: TextStyle(
+                fontSize: 11,
+                letterSpacing: 2.5,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
               ),
+              textAlign: TextAlign.center,
             ),
           ),
-
-          // Sticky Bottom Information Banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              border: Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5)),
-            ),
-            child: Text(
-              'Items are curated by our intelligent algorithm — updated daily',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 24,
+                childAspectRatio: 0.58,
               ),
+              itemCount: saleItems.length,
+              itemBuilder: (context, index) {
+                final item = saleItems[index];
+                return _buildArchiveCard(context, item['product'], item['salePrice']);
+              },
             ),
           ),
         ],
@@ -173,109 +71,108 @@ class _AutoSaleScreenState extends State<AutoSaleScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label) {
-    final isActive = _selectedFilter == label;
+  Widget _buildArchiveCard(BuildContext context, Product product, double salePrice) {
     return GestureDetector(
-      onTap: () => setState(() => _selectedFilter = label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? Colors.black : const Color(0xFFF5F5F5), // Elegant Black active state
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive ? Colors.white : Colors.black87,
-            fontSize: 13,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSaleProductCard(String name, String brand, String price, String oldPrice, String discount) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(4),
+      onTap: () {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(
+                product: product,
+              salePrice: salePrice,
             ),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
             child: Stack(
               children: [
-                Center(
-                  child: Icon(
-                    Icons.diamond_outlined,
-                    size: 50,
-                    color: Colors.grey[300],
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9F8F6),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.network(
+                      product.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Center(
+                        child: Icon(Icons.image_outlined, color: Colors.grey),
+                      ),
+                    ),
                   ),
                 ),
+                // Luxury Discount Tag
                 Positioned(
                   top: 8,
-                  right: 8,
+                  left: 8,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFC41E1E),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    child: Text(
-                      discount,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: Colors.black,
+                    child: const Text(
+                      'ARCHIVE',
+                      style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 1),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          brand.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey[500],
-            letterSpacing: 1,
+          const SizedBox(height: 12),
+          Text(
+            product.name,
+            style: const TextStyle(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w400, height: 1.3),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          name,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Text(
-              price,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFFC41E1E),
-                fontWeight: FontWeight.w700,
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Text(
+                '£${salePrice.toStringAsFixed(0)}',
+                style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600),
               ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              oldPrice,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[400],
-                decoration: TextDecoration.lineThrough,
+              const SizedBox(width: 8),
+              Text(
+                product.formattedPrice,
+                style: TextStyle(fontSize: 11, color: Colors.grey[400], decoration: TextDecoration.lineThrough),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
+}
+
+PreferredSizeWidget _buildHeader(BuildContext context, String title) {
+  return AppBar(
+    backgroundColor: Colors.white,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 18),
+      onPressed: () => Navigator.pop(context),
+    ),
+    centerTitle: true,
+    title: Text(
+      title,
+      style: GoogleFonts.josefinSans(fontSize: 22, fontWeight: FontWeight.w300, letterSpacing: 2, color: Colors.black),
+    ),
+    actions: [
+      Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: IconButton(
+          icon: const Icon(Icons.shopping_bag_outlined, color: Colors.black, size: 22),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen())),
+        ),
+      ),
+    ],
+  );
 }

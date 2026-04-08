@@ -1,85 +1,136 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'custom_jewellery_screen.dart';
 import 'auto_sale_screen.dart';
-import 'brands_screen.dart';
 import 'categories_screen.dart';
 import 'new_arrivals_screen.dart';
+import 'cart_screen.dart';
+import 'filtered_grid_screen.dart';
+import '../data/catalogue.dart';
 
-class ShopScreen extends StatelessWidget {
+class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
+
+  @override
+  State<ShopScreen> createState() => _ShopScreenState();
+}
+
+class _ShopScreenState extends State<ShopScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+
+  List<Product> _searchCatalogue(String keyword) {
+    if (keyword.trim().isEmpty) return [];
+
+    List<Product> matchedProducts = [];
+    final searchKeyword = keyword.toLowerCase();
+
+    for (final cat in Catalogue.categories) {
+      for (final sub in cat.subCategories) {
+        for (final product in sub.products) {
+
+          final searchString = '${product.name} ${product.collection} ${product.description}'.toLowerCase();
+
+          if (searchString.contains(searchKeyword)) {
+            matchedProducts.add(product);
+          }
+        }
+      }
+    }
+    return matchedProducts;
+  }
+
+  void _performSearch(String query) {
+    if (query.trim().isEmpty) return;
+
+    final results = _searchCatalogue(query);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FilteredGridScreen(
+          pageTitle: 'RESULTS FOR "$query"',
+          products: results,
+        ),
+      ),
+    );
+
+    _searchController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(72),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  'Shop',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.black,
-                    height: 1.0,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.shopping_bag_outlined, size: 24),
-                  onPressed: () {
-                    // TODO: Navigate to Cart Screen
-                  },
-                ),
-              ],
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Shop',
+          style: GoogleFonts.josefinSans(
+            fontSize: 20,
+            fontWeight: FontWeight.w400,
+            letterSpacing: 6,
+            color: Colors.black,
+            height: 1.0,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_bag_outlined, color: Colors.black, size: 24),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
+
+
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.search, color: Colors.grey[500], size: 20),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Search brands, categories',
-                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
-                  ),
-                ],
+              child: TextField(
+                controller: _searchController,
+                textInputAction: TextInputAction.search,
+                onSubmitted: _performSearch,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Search collections & pieces',
+                  hintStyle: TextStyle(color: Colors.grey[500], fontSize: 13, letterSpacing: 0.5),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 20),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
+                ),
               ),
             ),
+
             const SizedBox(height: 24),
 
-            // Interactive Navigation List
-            InteractiveShopTile(
-              title: 'Brands',
-              subtitle: 'Cartier, Tiffany, Bulgari & more',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BrandsScreen()),
-                );
-              },
-            ),
-            InteractiveShopTile(
-              title: 'Categories',
+
+            _LuxuryShopBanner(
+              title: 'CATEGORIES',
               subtitle: 'Rings, Necklaces, Bracelets & more',
+              imageUrl: 'https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg?auto=compress&cs=tinysrgb&w=800',
               onTap: () {
                 Navigator.push(
                   context,
@@ -87,19 +138,11 @@ class ShopScreen extends StatelessWidget {
                 );
               },
             ),
-            InteractiveShopTile(
-              title: 'Sale',
-              subtitle: 'Exclusive deals — updated daily',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AutoSaleScreen()),
-                );
-              },
-            ),
-            InteractiveShopTile(
-              title: 'New Arrivals',
-              subtitle: 'Latest collections added',
+
+            _LuxuryShopBanner(
+              title: 'NEW ARRIVALS',
+              subtitle: 'Discover our latest creations',
+              imageUrl: 'https://images.pexels.com/photos/22475821/pexels-photo-22475821.jpeg',
               onTap: () {
                 Navigator.push(
                   context,
@@ -107,9 +150,24 @@ class ShopScreen extends StatelessWidget {
                 );
               },
             ),
-            InteractiveShopTile(
-              title: 'Custom Jewellery',
-              subtitle: 'Design your perfect piece',
+
+            _LuxuryShopBanner(
+              title: 'SALE',
+              subtitle: 'Curated pieces at archive pricing',
+              imageUrl: 'https://images.pexels.com/photos/2735970/pexels-photo-2735970.jpeg?auto=compress&cs=tinysrgb&w=800',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AutoSaleScreen()),
+                );
+              },
+            ),
+
+            _LuxuryShopBanner(
+              title: 'CUSTOM JEWELLERY',
+              subtitle: 'Design your perfect masterpiece',
+
+              imageUrl: 'https://images.pexels.com/photos/6263143/pexels-photo-6263143.jpeg',
               onTap: () {
                 Navigator.push(
                   context,
@@ -118,117 +176,94 @@ class ShopScreen extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 30),
-
-            // Trending Now Section
-            const Text(
-              'TRENDING NOW',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 13,
-                letterSpacing: 3,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                _buildTrendingPill('Diamond Rings', true),
-                _buildTrendingPill('Gold Chains', false),
-                _buildTrendingPill('Studs', false),
-              ],
-            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildTrendingPill(String label, bool isActive) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.black : const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isActive ? Colors.white : Colors.black87,
-          fontSize: 13,
-        ),
-      ),
-    );
-  }
 }
 
 
-class InteractiveShopTile extends StatefulWidget {
+
+class _LuxuryShopBanner extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String imageUrl;
   final VoidCallback onTap;
 
-  const InteractiveShopTile({
+  const _LuxuryShopBanner({
     required this.title,
     required this.subtitle,
+    required this.imageUrl,
     required this.onTap,
-    super.key,
   });
-
-  @override
-  State<InteractiveShopTile> createState() => _InteractiveShopTileState();
-}
-
-class _InteractiveShopTileState extends State<InteractiveShopTile> {
-  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: onTap,
       child: Container(
+        height: 140,
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: _isPressed ? Colors.black : const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(4),
+          color: const Color(0xFFF5F5F5),
+          image: DecorationImage(
+            image: NetworkImage(imageUrl),
+            fit: BoxFit.cover,
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.title,
-                  style: TextStyle(
-                    color: _isPressed ? Colors.white : Colors.black,
-                    fontSize: 16,
-                    fontWeight: _isPressed ? FontWeight.w500 : FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.subtitle,
-                  style: TextStyle(
-                    color: _isPressed ? Colors.white.withOpacity(0.9) : Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
+        child: Container(
+
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.black.withOpacity(0.6),
               ],
             ),
-            Icon(
-              Icons.chevron_right,
-              color: _isPressed ? Colors.white : Colors.black87,
-            ),
-          ],
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 16,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,288 +1,363 @@
 import 'package:flutter/material.dart';
 import '../data/catalogue.dart';
 import 'payment_screen.dart';
+import '../services/cart_service.dart';
+import 'cart_screen.dart';
+import '../services/wishlist_service.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
+  final double? salePrice; // ── ADDED: Optional sale price ──
 
-  const ProductDetailScreen({super.key, required this.product});
+  // ── ADDED: this.salePrice to constructor ──
+  const ProductDetailScreen({super.key, required this.product, this.salePrice});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  bool _wishlisted = false;
+  late bool _wishlisted;
+
+  // ── ADDED: The Local Messenger Key to trap the notification ──
+  final GlobalKey<ScaffoldMessengerState> _messengerKey = GlobalKey<ScaffoldMessengerState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _wishlisted = WishlistService().isWishlisted(widget.product);
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = widget.product;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          // ── Hero image ─────────────────────────────────────────────────
-          SliverAppBar(
-            expandedHeight: 420,
-            pinned: true,
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, size: 18),
-              color: Colors.white,
-              onPressed: () => Navigator.pop(context),
-            ),
-            actions: [
-              IconButton(
-                icon: Icon(
-                  _wishlisted ? Icons.favorite : Icons.favorite_outline,
-                  color: _wishlisted ? const Color(0xFFD50032) : Colors.white,
+    // ── ADDED: Wrapped the Scaffold in the Local ScaffoldMessenger ──
+    return ScaffoldMessenger(
+      key: _messengerKey,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: CustomScrollView(
+          slivers: [
+            // ── Hero image ─────────────────────────────────────────────────
+            SliverAppBar(
+              expandedHeight: 420,
+              pinned: true,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios, size: 18),
+                color: Colors.white,
+                onPressed: () => Navigator.pop(context),
+              ),
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    _wishlisted ? Icons.favorite : Icons.favorite_outline,
+                    color: _wishlisted ? const Color(0xFFD50032) : Colors.white,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _wishlisted = !_wishlisted; // Update the UI heart
+                      WishlistService().toggleWishlist(p); // Actually save it to the database/service!
+                    });
+                  },
                 ),
-                onPressed: () => setState(() => _wishlisted = !_wishlisted),
-              ),
-              IconButton(
-                icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
-                onPressed: () {},
-              ),
-              const SizedBox(width: 4),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                p.imageUrl.replaceAll('w=600', 'w=900'),
-                fit: BoxFit.cover,
-                loadingBuilder: (ctx, child, progress) =>
-                    progress == null ? child : Container(color: const Color(0xFFF0EDEA)),
-                errorBuilder: (_, __, ___) =>
-                    Container(color: const Color(0xFFF0EDEA)),
+                IconButton(
+                  icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartScreen()),
+                    );
+                  },
+                ),
+                const SizedBox(width: 4),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                background: Image.network(
+                  p.imageUrl.replaceAll('w=600', 'w=900'),
+                  fit: BoxFit.cover,
+                  loadingBuilder: (ctx, child, progress) =>
+                  progress == null ? child : Container(color: const Color(0xFFF0EDEA)),
+                  errorBuilder: (_, __, ___) =>
+                      Container(color: const Color(0xFFF0EDEA)),
+                ),
               ),
             ),
-          ),
 
-          // ── Product info ───────────────────────────────────────────────
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name
-                  Text(
-                    p.name,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.5,
-                      height: 1.3,
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Price
-                  Text(
-                    p.formattedPrice,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 1,
-                    ),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  Text(
-                    'Price includes applicable taxes',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-                  const Divider(height: 1, color: Color(0xFFEEEEEE)),
-                  const SizedBox(height: 28),
-
-                  // Description heading
-                  const Text(
-                    'DESCRIPTION',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 3,
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  Text(
-                    p.description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      height: 1.8,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-                  const Divider(height: 1, color: Color(0xFFEEEEEE)),
-                  const SizedBox(height: 28),
-
-                  // Details
-                  const Text(
-                    'DETAILS',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 3,
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  _DetailRow(label: 'Reference', value: p.id.toUpperCase().replaceAll('_', ' ')),
-                  _DetailRow(label: 'Material', value: 'Gold, Diamond'),
-                  _DetailRow(label: 'Collection', value: p.collection.toUpperCase().replaceAll('_', ' ')),
-                  _DetailRow(label: 'Availability', value: 'In Boutique & Online'),
-
-                  const SizedBox(height: 40),
-
-                  // ── CTA buttons ────────────────────────────────────────
-
-                  // Buy now — goes straight to payment
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PaymentScreen(product: p),
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD50032),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      child: const Text(
-                        'BUY NOW',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 2.5,
-                        ),
+            // ── Product info ───────────────────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name
+                    Text(
+                      p.name,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.5,
+                        height: 1.3,
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
-                  // Add to bag
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${p.name} added to bag'),
-                            backgroundColor: Colors.black87,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4)),
-                            duration: const Duration(seconds: 2),
+                    // ── CHANGED: Smart Price Display ───────────────────────
+                    if (widget.salePrice != null)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '£${widget.salePrice!.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFD50032), // Maison Cartier Red
+                              letterSpacing: 1,
+                            ),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      child: const Text(
-                        'ADD TO BAG',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 2.5,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Contact boutique
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: OutlinedButton(
-                      onPressed: () => _showBoutiqueDialog(context, p),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.black, width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      child: const Text(
-                        'CONTACT A BOUTIQUE',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 13,
+                          const SizedBox(width: 8),
+                          Text(
+                            p.formattedPrice,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.grey[400],
+                              decoration: TextDecoration.lineThrough,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Text(
+                        p.formattedPrice,
+                        style: const TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
-                          letterSpacing: 2,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    // ───────────────────────────────────────────────────────
+
+                    const SizedBox(height: 6),
+
+                    Text(
+                      'Price includes applicable taxes',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[400],
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+
+                    const SizedBox(height: 28),
+                    const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                    const SizedBox(height: 28),
+
+                    // Description heading
+                    const Text(
+                      'DESCRIPTION',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 3,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Text(
+                      p.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        height: 1.8,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+
+                    const SizedBox(height: 28),
+                    const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                    const SizedBox(height: 28),
+
+                    // Details
+                    const Text(
+                      'DETAILS',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 3,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    _DetailRow(label: 'Reference', value: p.id.toUpperCase().replaceAll('_', ' ')),
+                    _DetailRow(label: 'Material', value: 'Gold, Diamond'),
+                    _DetailRow(label: 'Collection', value: p.collection.toUpperCase().replaceAll('_', ' ')),
+                    _DetailRow(label: 'Availability', value: 'In Boutique & Online'),
+
+                    const SizedBox(height: 40),
+
+                    // ── CTA buttons ────────────────────────────────────────
+
+                    // Buy now — goes straight to payment
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PaymentScreen(product: p),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD50032),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        child: const Text(
+                          'BUY NOW',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 2.5,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
-                  // Add to wishlist
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: TextButton.icon(
-                      onPressed: () =>
-                          setState(() => _wishlisted = !_wishlisted),
-                      icon: Icon(
-                        _wishlisted ? Icons.favorite : Icons.favorite_outline,
-                        size: 18,
-                        color: _wishlisted
-                            ? const Color(0xFFD50032)
-                            : Colors.black,
+                    // Add to bag
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          CartService().addToCart(p, salePrice: widget.salePrice);
+
+                          _messengerKey.currentState!.clearSnackBars();
+                          _messengerKey.currentState!.showSnackBar(
+                            SnackBar(
+                              content: Text('${p.name} added to bag'),
+                              backgroundColor: Colors.black87,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4)),
+                              duration: const Duration(seconds: 2),
+                              action: SnackBarAction(
+                                label: 'VIEW BAG',
+                                textColor: Colors.white,
+                                onPressed: () {
+
+                                  _messengerKey.currentState!.hideCurrentSnackBar();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        child: const Text(
+                          'ADD TO BAG',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 2.5,
+                          ),
+                        ),
                       ),
-                      label: Text(
-                        _wishlisted
-                            ? 'SAVED TO WISHLIST'
-                            : 'ADD TO WISHLIST',
-                        style: TextStyle(
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Contact boutique
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () => _showBoutiqueDialog(context, p),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.black, width: 1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        child: const Text(
+                          'CONTACT A BOUTIQUE',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Add to wishlist
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _wishlisted = !_wishlisted;
+                            WishlistService().toggleWishlist(p);
+                          });
+                        },
+                        icon: Icon(
+                          _wishlisted ? Icons.favorite : Icons.favorite_outline,
+                          size: 18,
                           color: _wishlisted
                               ? const Color(0xFFD50032)
                               : Colors.black,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 2,
+                        ),
+                        label: Text(
+                          _wishlisted
+                              ? 'SAVED TO WISHLIST'
+                              : 'ADD TO WISHLIST',
+                          style: TextStyle(
+                            color: _wishlisted
+                                ? const Color(0xFFD50032)
+                                : Colors.black,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 2,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 50),
-                ],
+                    const SizedBox(height: 50),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -327,7 +402,7 @@ void _showBoutiqueDialog(BuildContext context, Product product) {
           const SizedBox(height: 6),
           Text(
             'Our client advisors are available to assist you with '
-            '"${product.name}".',
+                '"${product.name}".',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w300,
