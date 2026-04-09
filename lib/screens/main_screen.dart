@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'home_screen.dart';
 import 'shop_screen.dart';
 import 'wishlist_screen.dart';
@@ -19,10 +20,6 @@ class _MainScreenState extends State<MainScreen>
   int _pendingIndex = 0;
   bool _showTransition = false;
 
-  // ── Debug HUD (small counter showing wheel schedule) ──
-  int _openCount = 0;
-  int _nextWheelOpen = 0;
-
   late AnimationController _controller;
 
   // Simple opacity fade for the white overlay covering the screen swap.
@@ -42,7 +39,7 @@ class _MainScreenState extends State<MainScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 1500),
     );
 
     // Bell curve: 0 → 1 → 0 (fade in, hold, fade out)
@@ -63,13 +60,6 @@ class _MainScreenState extends State<MainScreen>
 
   Future<void> _checkAndShowWheel() async {
     final show = await WheelService.recordOpenAndCheck();
-    final count = await WheelService.getOpenCount();
-    if (mounted) {
-      setState(() {
-        _openCount = count;
-        _nextWheelOpen = WheelService.nextTriggerOpen(count);
-      });
-    }
     if (show && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
@@ -94,8 +84,8 @@ class _MainScreenState extends State<MainScreen>
       _showTransition = true;
     });
 
-    // Swap the screen at the midpoint — while the overlay still hides it
-    Future.delayed(const Duration(milliseconds: 350), () {
+    // Swap the screen at the midpoint - while the overlay still hides it
+    Future.delayed(const Duration(milliseconds: 750), () {
       if (mounted) setState(() => _currentIndex = _pendingIndex);
     });
 
@@ -112,59 +102,42 @@ class _MainScreenState extends State<MainScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // ── Active screen ──────────────────────────────────────────────
+          //  Active screen 
           _screens[_currentIndex],
 
-          // ── Debug counter (top-right) ──────────────────────────────────
-          Positioned(
-            top: 38,
-            right: 10,
-            child: IgnorePointer(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.55),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'open #$_openCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    Text(
-                      'next 🎡 #$_nextWheelOpen',
-                      style: const TextStyle(
-                        color: Color(0xFFFFB3C1),
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // ── Simple fade overlay ────────────────────────────────────────
+          //  Panther transition overlay (gray → red morph) 
           if (_showTransition)
             AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
+                final t = _fadeAnimation.value;
+                // Morph grey → Cartier red as the overlay fades in
+                final tint = Color.lerp(
+                  const Color(0xFFBDBDBD),
+                  const Color(0xFFD50032),
+                  t,
+                )!;
                 return IgnorePointer(
-                  ignoring: _fadeAnimation.value < 0.05,
+                  ignoring: t < 0.05,
                   child: Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: Container(color: Colors.white),
+                    opacity: t,
+                    child: Container(
+                      color: Colors.white,
+                      child: Center(
+                        child: SizedBox(
+                          width: 90,
+                          height: 45,
+                          child: SvgPicture.asset(
+                            'assets/images/panther.svg',
+                            fit: BoxFit.contain,
+                            colorFilter: ColorFilter.mode(
+                              tint,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 );
               },
@@ -172,7 +145,7 @@ class _MainScreenState extends State<MainScreen>
         ],
       ),
 
-      // ── Bottom navigation ──────────────────────────────────────────────
+      //  Bottom navigation 
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           border: Border(

@@ -28,8 +28,11 @@ class PantherScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
         slivers: [
-          // ── App bar ──
+          //  App bar 
           SliverAppBar(
             backgroundColor: Colors.white,
             elevation: 0,
@@ -52,7 +55,7 @@ class PantherScreen extends StatelessWidget {
             centerTitle: true,
           ),
 
-          // ── Hero image with fading top & bottom edges ──
+          //  Hero image with fading top & bottom edges 
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 10),
@@ -104,7 +107,7 @@ class PantherScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Body ──
+          //  Body 
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(28, 8, 28, 40),
@@ -179,8 +182,8 @@ class PantherScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     'The panther has walked beside the Maison for more than a century. '
-                    'She first appeared in a Cartier illustration in 1914 — wild, elegant, '
-                    'impossible to tame — and soon became the spirit of the house. '
+                    'She first appeared in a Cartier illustration in 1914 - wild, elegant, '
+                    'impossible to tame - and soon became the spirit of the house. '
                     'Jeanne Toussaint, our legendary Directrice of Haute Joaillerie, was '
                     'affectionately called "La Panthère" by Louis Cartier himself. Under her '
                     'hand, the creature became Cartier\'s quiet symbol of grace, strength, '
@@ -206,7 +209,7 @@ class PantherScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'We owe her everything — and so we stand beside those who protect her. '
+                    'We owe her everything - and so we stand beside those who protect her. '
                     'Cartier partners with Panthera, the world\'s leading wild cat '
                     'conservation organisation, to safeguard panthers, leopards, jaguars '
                     'and snow leopards in their natural habitats. Together, we support '
@@ -236,7 +239,7 @@ class PantherScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     'The panther has given Cartier a soul. In return, we promise to '
-                    'return the favour — piece by piece, pawprint by pawprint. Every '
+                    'return the favour - piece by piece, pawprint by pawprint. Every '
                     'jewel carrying her silhouette is a small thank-you to the wild. '
                     'And every tap on the link below carries that same gratitude a '
                     'little further. Thank you for walking with us.',
@@ -251,7 +254,7 @@ class PantherScreen extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
-                  // ── CTA ──
+                  //  CTA 
                   SizedBox(
                     width: double.infinity,
                     height: 54,

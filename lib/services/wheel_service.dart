@@ -17,8 +17,13 @@ class WheelService {
     final count = (prefs.getInt(_keyOpenCount) ?? 0) + 1;
     await prefs.setInt(_keyOpenCount, count);
 
-    final positionInCycle = (count - 1) % _cycleLength;
-    return _triggerPositions.contains(positionInCycle);
+    //  DEMO BYPASS 
+    // Forces the wheel to appear on every single app open for the
+    // recorded presentation. Revert this to the commented line below
+    // after the demo to restore the real scheduling algorithm.
+    return true;
+    // final positionInCycle = (count - 1) % _cycleLength;
+    // return _triggerPositions.contains(positionInCycle);
   }
 
   static Future<int> getOpenCount() async {
@@ -36,7 +41,7 @@ class WheelService {
     return currentCount + 1;
   }
 
-  // ── For testing: reset counter ─────────────────────────────────────────
+  //  For testing: reset counter 
   static Future<void> resetForTesting() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyOpenCount, 0);

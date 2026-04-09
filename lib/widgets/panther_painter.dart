@@ -5,76 +5,76 @@ class PantherPainter extends CustomPainter {
 
   const PantherPainter({required this.color});
 
-  // Cartier Panthère — wide cat face, large clean polygons
+  // Cartier Panthère - wide cat face, large clean polygons
   // Width: -85 to +85 | Height: -90 to +78
   static const List<List<Offset>> _polygons = [
-    // ── LEFT EAR (points up-left) ──
+    //  LEFT EAR (points up-left) 
     [Offset(-38, -90), Offset(-68, -62), Offset(-18, -62)],
 
-    // ── RIGHT EAR (points up-right) ──
+    //  RIGHT EAR (points up-right) 
     [Offset(38, -90), Offset(68, -62), Offset(18, -62)],
 
-    // ── TOP FOREHEAD CENTER ──
+    //  TOP FOREHEAD CENTER 
     [Offset(-18, -62), Offset(18, -62), Offset(12, -42), Offset(-12, -42)],
 
-    // ── LEFT FOREHEAD ──
+    //  LEFT FOREHEAD 
     [Offset(-68, -62), Offset(-18, -62), Offset(-12, -42), Offset(-42, -35)],
 
-    // ── RIGHT FOREHEAD ──
+    //  RIGHT FOREHEAD 
     [Offset(68, -62), Offset(18, -62), Offset(12, -42), Offset(42, -35)],
 
-    // ── LEFT UPPER CHEEK (large sweeping) ──
+    //  LEFT UPPER CHEEK (large sweeping) 
     [Offset(-68, -62), Offset(-42, -35), Offset(-82, -5)],
 
-    // ── RIGHT UPPER CHEEK ──
+    //  RIGHT UPPER CHEEK 
     [Offset(68, -62), Offset(42, -35), Offset(82, -5)],
 
-    // ── LEFT EYE SURROUND ──
+    //  LEFT EYE SURROUND 
     [Offset(-42, -35), Offset(-12, -42), Offset(-10, -12), Offset(-36, -8)],
 
-    // ── RIGHT EYE SURROUND ──
+    //  RIGHT EYE SURROUND 
     [Offset(42, -35), Offset(12, -42), Offset(10, -12), Offset(36, -8)],
 
-    // ── NOSE BRIDGE (center between eyes) ──
+    //  NOSE BRIDGE (center between eyes) 
     [Offset(-12, -42), Offset(12, -42), Offset(10, -12), Offset(-10, -12)],
 
-    // ── LEFT MID CHEEK ──
+    //  LEFT MID CHEEK 
     [Offset(-82, -5), Offset(-42, -35), Offset(-36, -8), Offset(-65, 25)],
 
-    // ── RIGHT MID CHEEK ──
+    //  RIGHT MID CHEEK 
     [Offset(82, -5), Offset(42, -35), Offset(36, -8), Offset(65, 25)],
 
-    // ── LEFT LOWER CHEEK ──
+    //  LEFT LOWER CHEEK 
     [Offset(-65, 25), Offset(-36, -8), Offset(-10, -12), Offset(-8, 8), Offset(-26, 30)],
 
-    // ── RIGHT LOWER CHEEK ──
+    //  RIGHT LOWER CHEEK 
     [Offset(65, 25), Offset(36, -8), Offset(10, -12), Offset(8, 8), Offset(26, 30)],
 
-    // ── NOSE ──
+    //  NOSE 
     [Offset(-10, -12), Offset(10, -12), Offset(7, 8), Offset(-7, 8)],
 
-    // ── LEFT MUZZLE ──
+    //  LEFT MUZZLE 
     [Offset(-26, 30), Offset(-8, 8), Offset(-7, 28), Offset(-18, 46)],
 
-    // ── RIGHT MUZZLE ──
+    //  RIGHT MUZZLE 
     [Offset(26, 30), Offset(8, 8), Offset(7, 28), Offset(18, 46)],
 
-    // ── MUZZLE CENTER ──
+    //  MUZZLE CENTER 
     [Offset(-7, 8), Offset(7, 8), Offset(5, 28), Offset(-5, 28)],
 
-    // ── LEFT JAW ──
+    //  LEFT JAW 
     [Offset(-46, 50), Offset(-26, 30), Offset(-18, 46), Offset(-15, 62)],
 
-    // ── RIGHT JAW ──
+    //  RIGHT JAW 
     [Offset(46, 50), Offset(26, 30), Offset(18, 46), Offset(15, 62)],
 
-    // ── LEFT CHIN ──
+    //  LEFT CHIN 
     [Offset(-15, 62), Offset(-5, 28), Offset(0, 78)],
 
-    // ── RIGHT CHIN ──
+    //  RIGHT CHIN 
     [Offset(15, 62), Offset(5, 28), Offset(0, 78)],
 
-    // ── CHIN CENTER ──
+    //  CHIN CENTER 
     [Offset(-5, 28), Offset(5, 28), Offset(0, 78)],
   ];
 
@@ -103,7 +103,7 @@ class PantherPainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.fill;
 
-    // Wide format — 170 x 170
+    // Wide format - 170 x 170
     const double pantherW = 175.0;
     const double pantherH = 175.0;
 

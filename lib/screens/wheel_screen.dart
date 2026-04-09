@@ -169,7 +169,7 @@ class _WheelScreenState extends State<WheelScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ────────────────────────────────────────────────
+            //  Header 
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Column(
@@ -208,7 +208,7 @@ class _WheelScreenState extends State<WheelScreen>
 
             const Spacer(),
 
-            // ── Wheel ─────────────────────────────────────────────────
+            //  Wheel 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Stack(
@@ -245,7 +245,7 @@ class _WheelScreenState extends State<WheelScreen>
 
             const Spacer(),
 
-            // ── Buttons ───────────────────────────────────────────────
+            //  Buttons 
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
               child: SizedBox(
@@ -296,7 +296,7 @@ class _WheelScreenState extends State<WheelScreen>
   }
 }
 
-// ── Segment data ─────────────────────────────────────────────────────────────
+//  Segment data 
 
 class _Segment {
   final String label;
@@ -304,7 +304,7 @@ class _Segment {
   const _Segment(this.label, this.icon);
 }
 
-// ── Indicator triangle ────────────────────────────────────────────────────────
+//  Indicator triangle 
 
 class _Indicator extends StatelessWidget {
   const _Indicator();
@@ -337,7 +337,7 @@ class _TrianglePainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-// ── Wheel painter ─────────────────────────────────────────────────────────────
+//  Wheel painter 
 
 class _WheelPainter extends CustomPainter {
   final List<_Segment> segments;
@@ -357,7 +357,7 @@ class _WheelPainter extends CustomPainter {
     for (int i = 0; i < segments.length; i++) {
       final startAngle = -pi / 2 + i * segmentAngle;
 
-      // ── Segment fill ──────────────────────────────────────────────
+      //  Segment fill 
       final fill = Paint()
         ..color = _colors[i % _colors.length]
         ..style = PaintingStyle.fill;
@@ -369,7 +369,7 @@ class _WheelPainter extends CustomPainter {
         fill,
       );
 
-      // ── Divider line ──────────────────────────────────────────────
+      //  Divider line 
       final line = Paint()
         ..color = Colors.white.withOpacity(0.4)
         ..strokeWidth = 1.5
@@ -383,7 +383,7 @@ class _WheelPainter extends CustomPainter {
         line,
       );
 
-      // ── Label text ────────────────────────────────────────────────
+      //  Label text 
       final textAngle = startAngle + segmentAngle / 2;
       final textRadius = radius * 0.62;
       final textCenter = Offset(
@@ -414,7 +414,7 @@ class _WheelPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // ── Outer ring ────────────────────────────────────────────────
+    //  Outer ring 
     canvas.drawCircle(
       center,
       radius,
@@ -424,7 +424,7 @@ class _WheelPainter extends CustomPainter {
         ..strokeWidth = 3,
     );
 
-    // ── Centre circle ─────────────────────────────────────────────
+    //  Centre circle 
     canvas.drawCircle(center, radius * 0.17,
         Paint()..color = Colors.white);
     canvas.drawCircle(

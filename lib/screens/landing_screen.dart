@@ -100,7 +100,7 @@ class _LandingScreenState extends State<LandingScreen> {
             ),
           ),
 
-          // Mute button — top right
+          // Mute button - top right
           Positioned(
             top: 52,
             right: 20,
@@ -123,7 +123,7 @@ class _LandingScreenState extends State<LandingScreen> {
             ),
           ),
 
-          // Start button — bottom center
+          // Start button - bottom center
           Positioned(
             bottom: 60,
             left: 30,
