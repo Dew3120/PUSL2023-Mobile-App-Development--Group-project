@@ -11,6 +11,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -21,6 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
@@ -28,11 +30,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _onCreateAccount() async {
+    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
-    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
       setState(() => _error = 'Please fill in all fields.');
       return;
     }
@@ -52,6 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       await AuthService.signUp(email, password);
+      await AuthService.updateDisplayName(name);
       await AuthService.sendVerificationEmail();
       if (!mounted) return;
 
@@ -144,6 +148,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: [
+                      _buildField(
+                        controller: _nameController,
+                        hint: 'First name',
+                        keyboardType: TextInputType.name,
+                      ),
+                      const SizedBox(height: 24),
                       _buildField(
                         controller: _emailController,
                         hint: 'Email',

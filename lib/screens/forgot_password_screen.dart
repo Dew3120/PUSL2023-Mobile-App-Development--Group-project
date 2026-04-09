@@ -101,7 +101,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 40),
 
                 if (_sent) ...[
-                  // ── Success state ──
+                  //  Success state 
                   const Icon(Icons.mark_email_read_outlined,
                       color: Colors.white, size: 52),
                   const SizedBox(height: 20),
@@ -129,7 +129,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                 ] else ...[
-                  // ── Input state ──
+                  //  Input state 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 50),
                     child: Text(

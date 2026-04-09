@@ -49,11 +49,51 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _onLogin() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-    );
+  Future<void> _onLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _error = 'Please enter your email and password.');
+      return;
+    }
+
+    //  Demo bypass 
+    // Lets us sign in as the showcase user ("dewmith" / "12345") without
+    // hitting Firebase - so screenshots for the report look like a
+    // returning session. Accepts either "dewmith" or the full demo email.
+    final isDemoUsername = email.toLowerCase() == AuthService.demoUsername ||
+        email.toLowerCase() == AuthService.demoEmail;
+    if (isDemoUsername && password == AuthService.demoPassword) {
+      AuthService.signInAsDemo();
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+      );
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      await AuthService.signIn(email, password);
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = AuthService.parseError(e);
+          _loading = false;
+        });
+      }
+    }
   }
 
   @override
