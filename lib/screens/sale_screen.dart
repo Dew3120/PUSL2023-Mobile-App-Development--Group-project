@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/sale_service.dart';
 import '../screens/product_detail_screen.dart';
 
-/// La Sélection — a curated 6-hour daily window.
+/// La Sélection - a curated 6-hour daily window.
 /// Once the window closes, the user sees an empty state until the next day.
 class SaleScreen extends StatefulWidget {
   const SaleScreen({super.key});
@@ -24,6 +24,20 @@ class _SaleScreenState extends State<SaleScreen> {
   Timer? _ticker;
 
   static const _filters = ['All', 'Rings', 'Necklaces', 'Watches', 'Bags'];
+
+  // First 10 curated local asset images shown in La Sélection.
+  static const List<String> _selectionAssets = [
+    'assets/images/pn1_1.jpg',
+    'assets/images/pn1_2.jpg',
+    'assets/images/pn1_3.jpg',
+    'assets/images/pn1_4.jpg',
+    'assets/images/pn2_1.jpg',
+    'assets/images/pn2_2.jpg',
+    'assets/images/pn2_3.jpg',
+    'assets/images/pn2_4.jpg',
+    'assets/images/pn3_1.jpg',
+    'assets/images/pn3_2.jpg',
+  ];
 
   @override
   void initState() {
@@ -81,8 +95,10 @@ class _SaleScreenState extends State<SaleScreen> {
   }
 
   List<SaleProduct> get _filtered {
-    if (_activeFilter == 'All') return _allProducts;
-    return _allProducts.where((p) {
+    // La Sélection always displays exactly the first 10 curated pieces.
+    final base = _allProducts.take(_selectionAssets.length).toList();
+    if (_activeFilter == 'All') return base;
+    return base.where((p) {
       final name = p.subCategoryName.toLowerCase();
       return name.contains(_activeFilter.toLowerCase()) ||
           p.categoryName.toLowerCase().contains(_activeFilter.toLowerCase());
@@ -119,14 +135,14 @@ class _SaleScreenState extends State<SaleScreen> {
     );
   }
 
-  // ── Window OPEN — products + countdown ─────────────────────────────────
+  //  Window OPEN - products + countdown 
   Widget _buildOpenWindow() {
     final products = _filtered;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Header ──
+        //  Header 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: Row(
@@ -151,7 +167,7 @@ class _SaleScreenState extends State<SaleScreen> {
                       ),
                     ),
                     Text(
-                      'A curated window — today only',
+                      'A curated window - today only',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w300,
@@ -165,7 +181,7 @@ class _SaleScreenState extends State<SaleScreen> {
           ),
         ),
 
-        // ── Countdown banner ──
+        //  Countdown banner 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Container(
@@ -190,7 +206,7 @@ class _SaleScreenState extends State<SaleScreen> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'Hours — Minutes — Seconds',
+                      'Hours - Minutes - Seconds',
                       style: TextStyle(
                         color: Colors.white54,
                         fontSize: 10,
@@ -217,7 +233,7 @@ class _SaleScreenState extends State<SaleScreen> {
 
         const SizedBox(height: 14),
 
-        // ── Filter chips ──
+        //  Filter chips 
         SizedBox(
           height: 36,
           child: ListView.separated(
@@ -266,7 +282,7 @@ class _SaleScreenState extends State<SaleScreen> {
         ),
         const SizedBox(height: 4),
 
-        // ── Grid ──
+        //  Grid 
         Expanded(
           child: products.isEmpty
               ? Center(
@@ -289,12 +305,24 @@ class _SaleScreenState extends State<SaleScreen> {
                     childAspectRatio: 0.6,
                   ),
                   itemCount: products.length,
-                  itemBuilder: (context, i) =>
-                      _SaleCard(saleProduct: products[i]),
+                  itemBuilder: (context, i) {
+                    // Map each card to its curated local asset by the
+                    // product's original position in the unfiltered list.
+                    final originalIndex =
+                        _allProducts.indexOf(products[i]);
+                    final assetPath = (originalIndex >= 0 &&
+                            originalIndex < _selectionAssets.length)
+                        ? _selectionAssets[originalIndex]
+                        : null;
+                    return _SaleCard(
+                      saleProduct: products[i],
+                      assetOverride: assetPath,
+                    );
+                  },
                 ),
         ),
 
-        // ── Footer ──
+        //  Footer 
         Container(
           width: double.infinity,
           color: const Color(0xFFF8F8F8),
@@ -313,7 +341,7 @@ class _SaleScreenState extends State<SaleScreen> {
     );
   }
 
-  // ── Window CLOSED — empty state ─────────────────────────────────────────
+  //  Window CLOSED - empty state 
   Widget _buildClosedWindow() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -392,11 +420,12 @@ class _SaleScreenState extends State<SaleScreen> {
   }
 }
 
-// ── Sale product card ────────────────────────────────────────────────────────
+//  Sale product card 
 
 class _SaleCard extends StatelessWidget {
   final SaleProduct saleProduct;
-  const _SaleCard({required this.saleProduct});
+  final String? assetOverride;
+  const _SaleCard({required this.saleProduct, this.assetOverride});
 
   @override
   Widget build(BuildContext context) {
@@ -418,21 +447,33 @@ class _SaleCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
                   child: SizedBox.expand(
-                    child: Image.network(
-                      p.imageUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (ctx, child, progress) =>
-                          progress == null
-                              ? child
-                              : Container(color: const Color(0xFFF4F1EE)),
-                      errorBuilder: (ctx, err, st) => Container(
-                        color: const Color(0xFFF4F1EE),
-                        child: const Center(
-                          child: Icon(Icons.image_outlined,
-                              color: Color(0xFFCBC2B8), size: 28),
-                        ),
-                      ),
-                    ),
+                    child: assetOverride != null
+                        ? Image.asset(
+                            assetOverride!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (ctx, err, st) => Container(
+                              color: const Color(0xFFF4F1EE),
+                              child: const Center(
+                                child: Icon(Icons.image_outlined,
+                                    color: Color(0xFFCBC2B8), size: 28),
+                              ),
+                            ),
+                          )
+                        : Image.network(
+                            p.imageUrl,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (ctx, child, progress) =>
+                                progress == null
+                                    ? child
+                                    : Container(color: const Color(0xFFF4F1EE)),
+                            errorBuilder: (ctx, err, st) => Container(
+                              color: const Color(0xFFF4F1EE),
+                              child: const Center(
+                                child: Icon(Icons.image_outlined,
+                                    color: Color(0xFFCBC2B8), size: 28),
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 Positioned(

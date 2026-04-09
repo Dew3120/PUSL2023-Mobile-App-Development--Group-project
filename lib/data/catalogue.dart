@@ -1,13 +1,19 @@
 // lib/data/catalogue.dart
-// Full Cartier catalogue — 6 categories, 37 subcategories, 27 products each
+// Full Cartier catalogue - 6 categories, 37 subcategories, 27 products each
 
 class Product {
   final String id;
   final String name;
   final String collection;
   final double price;
-  final String imageUrl;
-  final String description;
+  final String imageUrl;            // primary (legacy / first image)
+  final List<String> images;        // multiple images for the gallery grid
+  final bool isAsset;               // true → load via Image.asset, else network
+  final String description;         // short marketing line
+  final String fullDescription;     // long description for the detail page
+  final String? ref;                // Cartier reference like "CRH4408853"
+  final List<String> sizes;         // available sizes (rings, bracelets)
+  final bool requestPrice;          // true → show "Request Price" instead of $
 
   const Product({
     required this.id,
@@ -15,10 +21,20 @@ class Product {
     required this.collection,
     required this.price,
     required this.imageUrl,
+    this.images = const [],
+    this.isAsset = false,
     required this.description,
+    this.fullDescription = '',
+    this.ref,
+    this.sizes = const [],
+    this.requestPrice = false,
   });
 
+  /// All gallery images, falling back to the single primary image.
+  List<String> get gallery => images.isNotEmpty ? images : [imageUrl];
+
   String get formattedPrice {
+    if (requestPrice) return 'Request Price';
     final p = price.toInt();
     final s = p.toString();
     final buf = StringBuffer('\$');
@@ -34,11 +50,15 @@ class Product {
 class SubCategory {
   final String id;
   final String name;
+  final String description;
+  final String? imageAsset;
   final List<Product> products;
 
   SubCategory({
     required this.id,
     required this.name,
+    this.description = '',
+    this.imageAsset,
     required this.products,
   });
 
@@ -61,14 +81,14 @@ class MainCategory {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Catalogue
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 class Catalogue {
   Catalogue._();
 
-  // ── 27 unique Unsplash URLs per category ────────────────────────────────
+  //  27 unique Unsplash URLs per category 
 
   static const _imgJewel = [
     'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&fit=crop&q=80',
@@ -220,7 +240,7 @@ class Catalogue {
     'https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=600&fit=crop&q=80',
   ];
 
-  // ── Product generator ───────────────────────────────────────────────────
+  //  Product generator 
 
   static List<Product> _gen({
     required String prefix,
@@ -235,7 +255,7 @@ class Catalogue {
     return List.generate(27, (i) {
       final name = i < names.length
           ? names[i]
-          : '${names[i % names.length]} — Edition ${_roman(i - names.length + 2)}';
+          : '${names[i % names.length]} - Edition ${_roman(i - names.length + 2)}';
       return Product(
         id: '${prefix}_$i',
         name: name,
@@ -262,11 +282,173 @@ class Catalogue {
     return result;
   }
 
-  // ── Full catalogue ──────────────────────────────────────────────────────
+  //  Curated Panther products (hero subcategory) 
+  // Each product has 4 images: pn{n}_1..pn{n}_4.jpg in assets/images/
+  // Drop the files manually - missing files fall back to a placeholder.
+
+  static const String _pantherStory =
+      "The panther, the symbolic animal of Cartier, made its first appearance "
+      "in the Maison's collections in 1914. Louis Cartier was the first to tame "
+      "the mythic animal, and his colleague Jeanne Toussaint turned it into a "
+      "legend. The panther can be fierce, playful, or lovable, displaying all "
+      "the facets of its liberated personality from one collection to the next.";
+
+  static final List<Product> _pantherProducts = [
+    Product(
+      id: 'pn1',
+      name: 'Panthère de Cartier ring, paved',
+      collection: 'Panthère de Cartier',
+      price: 280000,
+      imageUrl: 'assets/images/pn1_1.jpg',
+      images: [
+        'assets/images/pn1_1.jpg',
+        'assets/images/pn1_2.jpg',
+        'assets/images/pn1_3.jpg',
+        'assets/images/pn1_4.jpg',
+      ],
+      isAsset: true,
+      description: _pantherStory,
+      fullDescription:
+          "Panthère de Cartier ring\n\n"
+          "• 18K white gold (750/1000)\n"
+          "• Set with 591 brilliant-cut diamonds totaling 5.12 carats\n"
+          "• Emerald and onyx\n\n"
+          "Please note that the carat weight, number of stones and product "
+          "dimensions will vary based on the size of the creation you order. "
+          "For detailed information please contact us.",
+      ref: 'CRH4408853',
+      sizes: ['50 MM', '51 MM', '52 MM', '53 MM', '54 MM', '55 MM'],
+    ),
+    Product(
+      id: 'pn2',
+      name: 'Panthère de Cartier bracelet, paved',
+      collection: 'Panthère de Cartier',
+      price: 259000,
+      imageUrl: 'assets/images/pn2_1.jpg',
+      images: [
+        'assets/images/pn2_1.jpg',
+        'assets/images/pn2_2.jpg',
+        'assets/images/pn2_3.jpg',
+        'assets/images/pn2_4.jpg',
+      ],
+      isAsset: true,
+      description: _pantherStory,
+      fullDescription:
+          "Panthère de Cartier bracelet\n\n"
+          "• 18K yellow gold (750/1000)\n"
+          "• Onyx\n"
+          "• Set with 4 emeralds and 467 brilliant-cut diamonds "
+          "totaling 11.86 carats (for size 17)\n\n"
+          "Please note that the carat weight, number of stones and product "
+          "dimensions will vary based on the size of the creation you order. "
+          "For detailed information please contact us.",
+      ref: 'H6049917',
+      sizes: ['15', '16', '17', '18', '19'],
+    ),
+    Product(
+      id: 'pn3',
+      name: 'Panthère de Cartier ring, black lacquer, paved',
+      collection: 'Panthère de Cartier',
+      price: 58500,
+      imageUrl: 'assets/images/pn3_1.jpg',
+      images: [
+        'assets/images/pn3_1.jpg',
+        'assets/images/pn3_2.jpg',
+        'assets/images/pn3_3.jpg',
+        'assets/images/pn3_4.jpg',
+      ],
+      isAsset: true,
+      description: _pantherStory,
+      fullDescription:
+          "Panthère de Cartier ring\n\n"
+          "• 18K white gold (750/1000)\n"
+          "• Black lacquer\n"
+          "• Set with brilliant-cut diamonds\n"
+          "• Tsavorite garnet eyes, onyx nose\n\n"
+          "Please note that the carat weight, number of stones and product "
+          "dimensions will vary based on the size of the creation you order.",
+      ref: 'H4406500',
+      sizes: ['50 MM', '51 MM', '52 MM', '53 MM', '54 MM', '55 MM'],
+    ),
+    Product(
+      id: 'pn4',
+      name: 'Panthère de Cartier bracelet, paved',
+      collection: 'Panthère de Cartier',
+      price: 261000,
+      imageUrl: 'assets/images/pn4_1.jpg',
+      images: [
+        'assets/images/pn4_1.jpg',
+        'assets/images/pn4_2.jpg',
+        'assets/images/pn4_3.jpg',
+        'assets/images/pn4_4.jpg',
+      ],
+      isAsset: true,
+      description: _pantherStory,
+      fullDescription:
+          "Panthère de Cartier bracelet\n\n"
+          "• 18K white gold (750/1000)\n"
+          "• Onyx\n"
+          "• Set with brilliant-cut diamonds and emerald eyes\n\n"
+          "Please note that the carat weight, number of stones and product "
+          "dimensions will vary based on the size of the creation you order.",
+      ref: 'H6019717',
+      sizes: ['15', '16', '17', '18', '19'],
+    ),
+    Product(
+      id: 'pn5',
+      name: 'Panthère de Cartier necklace, paved',
+      collection: 'Panthère de Cartier',
+      price: 0,
+      requestPrice: true,
+      imageUrl: 'assets/images/pn5_1.jpg',
+      images: [
+        'assets/images/pn5_1.jpg',
+        'assets/images/pn5_2.jpg',
+        'assets/images/pn5_3.jpg',
+        'assets/images/pn5_4.jpg',
+      ],
+      isAsset: true,
+      description: _pantherStory,
+      fullDescription:
+          "Panthère de Cartier necklace\n\n"
+          "• 18K white gold (750/1000)\n"
+          "• Set with brilliant-cut diamonds\n"
+          "• Onyx and emerald accents\n\n"
+          "An exceptional piece, available on request. "
+          "Please contact a Cartier ambassador for full details.",
+      ref: 'H7001185',
+    ),
+    Product(
+      id: 'pn6',
+      name: 'Panthère de Cartier ring, paved',
+      collection: 'Panthère de Cartier',
+      price: 104000,
+      imageUrl: 'assets/images/pn6_1.jpg',
+      images: [
+        'assets/images/pn6_1.jpg',
+        'assets/images/pn6_2.jpg',
+        'assets/images/pn6_3.jpg',
+        'assets/images/pn6_4.jpg',
+      ],
+      isAsset: true,
+      description: _pantherStory,
+      fullDescription:
+          "Panthère de Cartier ring\n\n"
+          "• 18K white gold (750/1000)\n"
+          "• Set with brilliant-cut diamonds\n"
+          "• Emerald eyes, onyx nose\n\n"
+          "Please note that the carat weight, number of stones and product "
+          "dimensions will vary based on the size of the creation you order.",
+      ref: 'H4413100',
+      sizes: ['50 MM', '51 MM', '52 MM', '53 MM', '54 MM', '55 MM'],
+    ),
+  ];
+
+  //  Full catalogue 
 
   static final List<MainCategory> categories = [
 
-    // ── 1. HIGH JEWELLERY ──────────────────────────────────────────────────
+    //  1. HIGH JEWELLERY 
     MainCategory(
       id: 'high_jewellery',
       name: 'HIGH JEWELLERY',
@@ -276,72 +458,77 @@ class Catalogue {
           'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=900&fit=crop&q=80',
       subCategories: [
         SubCategory(
-          id: 'hj_all',
-          name: 'All Creations',
+          id: 'hj_indomptables',
+          name: 'Indomptables de Cartier',
+          description:
+              "A collection that challenges the Cartier menagerie and pushes the imposed boundaries of figuration.",
+          imageAsset: 'assets/images/hj_indomptables.jpg',
           products: _gen(
-            prefix: 'hj_all',
-            names: ['Panthère Émeraude Necklace', 'Indomptables Bracelet', 'Flora & Fauna Ring', 'Reflection of a Legend Brooch', 'Geometry & Contrasts Set', 'Living Legacy Tiara', 'Exceptional Stones Pendant', 'Les Éblouissants Earrings'],
-            imgs: _imgJewel, basePrice: 45000, step: 12000,
+            prefix: 'hj_indomptables',
+            names: ['Indomptables Bracelet Onyx', 'Indomptables Necklace Emerald', 'Indomptables Ring Diamond', 'Indomptables Cuff Gold', 'Indomptables Earrings Sapphire', 'Indomptables Brooch Ruby', 'Indomptables Pendant', 'Indomptables Bangle'],
+            imgs: _imgJewel, basePrice: 62000, step: 14000,
           ),
         ),
         SubCategory(
-          id: 'hj_latest',
-          name: 'Latest Collections',
+          id: 'hj_panther',
+          name: 'Panther',
+          description:
+              "A wild animal whose symbolism and elegance have reigned over the Maison's creativity since its first appearance in 1914.",
+          imageAsset: 'assets/images/hj_panther.jpg',
+          products: _pantherProducts,
+        ),
+        SubCategory(
+          id: 'hj_flora_fauna',
+          name: 'Flora & Fauna',
+          description:
+              "There is nothing romantic or sweet when it comes to nature at Cartier, instead it is a unique and liberated vision of flora and fauna.",
+          imageAsset: 'assets/images/hj_flora_fauna.jpg',
           products: _gen(
-            prefix: 'hj_latest',
-            names: ['Indomptables Necklace', 'Flora & Fauna Bracelet', 'Markers of Style Ring', 'Living Legacy Earrings', 'Reflection Pendant', 'Panthère Brooch', 'Geometric Ring', 'New Season Tiara'],
-            imgs: _imgJewel, basePrice: 55000, step: 15000,
+            prefix: 'hj_flora_fauna',
+            names: ['Orchid Petal Ring', 'Hummingbird Brooch', 'Lotus Necklace', 'Butterfly Earrings', 'Vine Bracelet', 'Bird of Paradise Pendant', 'Wildflower Tiara', 'Serpent Bangle'],
+            imgs: _imgJewel, basePrice: 58000, step: 16000,
           ),
         ),
         SubCategory(
-          id: 'hj_markers',
-          name: 'Markers of Style',
+          id: 'hj_architecture',
+          name: 'Architecture & Purity',
+          description:
+              "To liberate a gemstone's radiance, Cartier envisions its creations as architectural pieces of light.",
+          imageAsset: 'assets/images/hj_architecture.jpg',
           products: _gen(
-            prefix: 'hj_markers',
-            names: ['Style Icon Necklace', 'Iconic Bracelet', 'Heritage Ring', 'Signature Earrings', 'Statement Pendant', 'Timeless Choker', 'Classic Bangle', 'Panthère Brooch'],
-            imgs: _imgJewel, basePrice: 38000, step: 9000,
+            prefix: 'hj_architecture',
+            names: ['Linear Diamond Necklace', 'Architect Cuff', 'Pure Line Ring', 'Symmetry Earrings', 'Modernist Pendant', 'Column Bracelet', 'Pillar Brooch', 'Geometry Bangle'],
+            imgs: _imgJewel, basePrice: 52000, step: 13000,
           ),
         ),
         SubCategory(
-          id: 'hj_panthere',
-          name: 'Iconic Panthère',
+          id: 'hj_geometry',
+          name: 'Geometry & Contrasts',
+          description:
+              "Two powerful markers of the Cartier style that combine architectural design and symmetry with the power of intense chromatic contrasts.",
+          imageAsset: 'assets/images/hj_geometry.jpg',
           products: _gen(
-            prefix: 'hj_panthere',
-            names: ['Panthère Necklace Emerald', 'Panthère Ring Diamond', 'Panthère Bracelet Onyx', 'Panthère Brooch Sapphire', 'Panthère Earrings Gold', 'Panthère Pendant', 'Panthère Bangle', 'Panthère Choker'],
-            imgs: _imgJewel, basePrice: 60000, step: 20000,
+            prefix: 'hj_geometry',
+            names: ['Contrasts Onyx Ring', 'Geometric Diamond Necklace', 'Black & White Cuff', 'Hexagon Earrings', 'Prism Pendant', 'Mosaic Brooch', 'Triangle Bangle', 'Cube Ring'],
+            imgs: _imgJewel, basePrice: 56000, step: 15000,
           ),
         ),
         SubCategory(
-          id: 'hj_legacy',
-          name: 'Living Legacy',
+          id: 'hj_fine_watches',
+          name: 'Fine Jewellery Watches',
+          description:
+              "Linking the two founding crafts of the Maison, jewellery and watchmaking, these pieces incorporate constantly renewed creativity.",
+          imageAsset: 'assets/images/hj_fine_watches.jpg',
           products: _gen(
-            prefix: 'hj_legacy',
-            names: ['Legacy Necklace', 'Heritage Bracelet', 'Ancestral Ring', 'Timeless Earrings', 'Dynasty Pendant', 'Heirloom Brooch', 'Classic Legacy Ring', 'Maison Heritage Piece'],
-            imgs: _imgJewel, basePrice: 50000, step: 18000,
-          ),
-        ),
-        SubCategory(
-          id: 'hj_stones',
-          name: 'Exceptional Stones',
-          products: _gen(
-            prefix: 'hj_stones',
-            names: ['Colombian Emerald Ring', 'Burma Ruby Necklace', 'Kashmir Sapphire Bracelet', 'Pink Diamond Earrings', 'Paraiba Tourmaline Ring', 'Alexandrite Pendant', 'Padparadscha Ring', 'Blue Diamond Brooch'],
-            imgs: _imgJewel, basePrice: 80000, step: 30000,
-          ),
-        ),
-        SubCategory(
-          id: 'hj_knowhow',
-          name: 'Know-How',
-          products: _gen(
-            prefix: 'hj_knowhow',
-            names: ['Pavé Diamond Necklace', 'Hand-Engraved Bracelet', 'Gem-Setting Ring', 'Milgrain Earrings', 'Filigree Pendant', 'Granulation Brooch', 'Repoussé Bangle', 'Inlay Masterpiece'],
-            imgs: _imgJewel, basePrice: 42000, step: 11000,
+            prefix: 'hj_fine_watches',
+            names: ['Panthère Joaillerie Watch', 'Baignoire Diamond Watch', 'Coussin Pavé Watch', 'Hypnose Diamond Watch', 'Mini Tank Joaillerie', 'Ronde Louis Pavé', 'Santos-Dumont Joaillerie', 'Tortue Diamond Watch'],
+            imgs: _imgJewel, basePrice: 85000, step: 28000,
           ),
         ),
       ],
     ),
 
-    // ── 2. JEWELLERY ───────────────────────────────────────────────────────
+    //  2. JEWELLERY 
     MainCategory(
       id: 'jewellery',
       name: 'JEWELLERY',
@@ -416,7 +603,7 @@ class Catalogue {
       ],
     ),
 
-    // ── 3. WATCHES ────────────────────────────────────────────────────────
+    //  3. WATCHES 
     MainCategory(
       id: 'watches',
       name: 'WATCHES',
@@ -509,7 +696,7 @@ class Catalogue {
       ],
     ),
 
-    // ── 4. BAGS & ACCESSORIES ─────────────────────────────────────────────
+    //  4. BAGS & ACCESSORIES 
     MainCategory(
       id: 'bags',
       name: 'BAGS & ACCESSORIES',
@@ -566,12 +753,12 @@ class Catalogue {
       ],
     ),
 
-    // ── 5. FRAGRANCES ─────────────────────────────────────────────────────
+    //  5. FRAGRANCES 
     MainCategory(
       id: 'fragrances',
       name: 'FRAGRANCES',
       description:
-          "An olfactory journey through the Maison's heritage — each Cartier fragrance an intimate signature of exceptional savoir-faire.",
+          "An olfactory journey through the Maison's heritage - each Cartier fragrance an intimate signature of exceptional savoir-faire.",
       imageUrl:
           'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=900&fit=crop&q=80',
       subCategories: [
@@ -616,14 +803,14 @@ class Catalogue {
           name: 'Choose Your Fragrance',
           products: _gen(
             prefix: 'f_choose',
-            names: ['For Her — La Panthère', 'For Him — Pasha', 'For Her — Baiser Volé', 'For Him — Déclaration', 'Unisex — Oud & Oud', 'For Her — Carat', 'For Him — Roadster', 'Gift for Her', 'Gift for Him', 'The Signature Edit'],
+            names: ['For Her - La Panthère', 'For Him - Pasha', 'For Her - Baiser Volé', 'For Him - Déclaration', 'Unisex - Oud & Oud', 'For Her - Carat', 'For Him - Roadster', 'Gift for Her', 'Gift for Him', 'The Signature Edit'],
             imgs: _imgFrag, basePrice: 90, step: 20,
           ),
         ),
       ],
     ),
 
-    // ── 6. HOME & STATIONERY ──────────────────────────────────────────────
+    //  6. HOME & STATIONERY 
     MainCategory(
       id: 'home_stationery',
       name: 'HOME & STATIONERY',

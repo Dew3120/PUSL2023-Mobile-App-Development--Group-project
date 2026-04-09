@@ -33,7 +33,7 @@ class _Metrics {
   double get conversionRate =>
       viewCount > 0 ? purchaseCount / viewCount : 0.0;
 
-  /// Under-performance score 0–1 (higher = more under-performing)
+  /// Under-performance score 0-1 (higher = more under-performing)
   double get score {
     final convScore = (1 - (conversionRate / 0.1)).clamp(0.0, 1.0);
     final ageScore = (daysSinceLastSale / 90).clamp(0.0, 1.0);
@@ -59,7 +59,7 @@ class SaleService {
 
     final rng = Random(today * 31); // deterministic per day
 
-    // ── Step 1: Generate mock performance metrics per product ─────────────
+    //  Step 1: Generate mock performance metrics per product 
     // Seed per product = hash so metrics are stable per product ID
     final allQualifying = <SaleProduct>[];
 
@@ -76,7 +76,7 @@ class SaleService {
             daysSinceLastSale: pRng.nextInt(120),
           );
 
-          // ── Step 2: Flag underperforming items ──────────────────────────
+          //  Step 2: Flag underperforming items 
           // Thresholds: conversion < 5%, last sale > 45 days, wishlist < 15
           final underperforming = metrics.conversionRate < 0.05 ||
               metrics.daysSinceLastSale > 45 ||
@@ -105,8 +105,8 @@ class SaleService {
       }
     }
 
-    // ── Step 3: Curated second layer ────────────────────────────────────
-    // Not every qualifying item is shown simultaneously — luxury scarcity.
+    //  Step 3: Curated second layer 
+    // Not every qualifying item is shown simultaneously - luxury scarcity.
     // Sort by score descending, shuffle top half, take ~40 for curation.
     allQualifying.sort((a, b) {
       final sa = _scoreFor(a.product.id);
